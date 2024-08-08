@@ -28,6 +28,8 @@ login_soup = BeautifulSoup(login_page_response.content, 'html.parser')
 csrf_token = login_soup.find('input', {'name': 'csrf_token'})
 if csrf_token:
     payload['csrf_token'] = csrf_token['value']
+else :
+    print("No CSRF token found!")
 
 # If there's a captcha, you may need to handle it manually
 captcha_image_url = 'https://siakad.uin-malang.ac.id/captcha.php'
@@ -63,7 +65,7 @@ if 'logout' in login_response.text.lower():
         # Parse the HTML content of the data response
         soup = BeautifulSoup(data_response.content, 'html.parser')
         
-        headers_data = [ "", "Hari", "Jam", "Kode Matkul", "Mata Kuliah", "Dosen", "Asisten Dosen", "Ruang", "Kelas", "Tatap Muka", "Angkatan", "Kapasitas" ]
+        table_headers = [ "", "Hari", "Jam", "Kode Matkul", "Mata Kuliah", "Dosen", "Asisten Dosen", "Ruang", "Kelas", "Tatap Muka", "Angkatan", "Kapasitas" ]
 
         # Locate the div with id "nav-matakuliah"
         matakuliah_div = soup.find('div', {'id': 'nav-matakuliah'})
@@ -78,6 +80,9 @@ if 'logout' in login_response.text.lower():
             # Ensure the table was found
             if table:
                 print("Found the table within 'nav-matakuliah' div!")
+                
+                file_name = input("Please enter file name : ")
+                file_name = file_name + ".xlsx"
 
                 # Extract table rows
                 rows = table.find_all('tr')
@@ -96,8 +101,8 @@ if 'logout' in login_response.text.lower():
                 print("Total data =", i)
                 
                 df = pd.DataFrame(table_data)
-                df.to_excel('jadwal.xlsx', index=False, header=headers_data)
-                print("Success Converting to Excel!")
+                df.to_excel(file_name, index=False, header=table_headers)
+                print(f"Data saved to {file_name}!")
             else:
                 print("Table not found within 'nav-matakuliah' div.")
         else:
