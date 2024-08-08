@@ -2,6 +2,7 @@ import requests
 import os
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+import pandas as pd
 
 load_dotenv()
 
@@ -61,6 +62,8 @@ if 'logout' in login_response.text.lower():
 
         # Parse the HTML content of the data response
         soup = BeautifulSoup(data_response.content, 'html.parser')
+        
+        headers_data = [ "", "Hari", "Jam", "Kode Matkul", "Mata Kuliah", "Dosen", "Asisten Dosen", "Ruang", "Kelas", "Tatap Muka", "Angkatan", "Kapasitas" ]
 
         # Locate the div with id "nav-matakuliah"
         matakuliah_div = soup.find('div', {'id': 'nav-matakuliah'})
@@ -80,15 +83,21 @@ if 'logout' in login_response.text.lower():
                 rows = table.find_all('tr')
                 
                 i = 0
-
+                
+                table_data = []
+                
                 # Loop through rows and extract data
                 for row in rows:
                     columns = row.find_all('td')
                     data = [column.text.strip() for column in columns]
                     i = i + 1
-                    print(data)
+                    table_data.append(data)
                     
-                print("Total data = ", i)
+                print("Total data =", i)
+                
+                df = pd.DataFrame(table_data)
+                df.to_excel('jadwal.xlsx', index=False, header=headers_data)
+                print("Success Converting to Excel!")
             else:
                 print("Table not found within 'nav-matakuliah' div.")
         else:
