@@ -1,4 +1,8 @@
 .env
 captcha.jpg
 test.html
-jadwal.xlsx
+
+base.py
+TODO.md
+
+__pycache__
