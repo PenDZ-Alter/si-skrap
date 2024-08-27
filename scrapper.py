@@ -74,21 +74,35 @@ class Scrapper :
             # Parse the HTML content of the data response
             soup = BeautifulSoup(self.fetch_data().content, 'html.parser')
             
-            table_headers = [ "", "Hari", "Jam", "Kode Matkul", "Mata Kuliah", "Dosen", "Asisten Dosen", "Ruang", "Kelas", "Tatap Muka", "Angkatan", "Kapasitas" ]
+            table_headers = None
 
-            # Locate the div with id "nav-matakuliah"
-            parent_div = soup.find('div', {'id': 'nav-matakuliah'})
+            print("\nType to parse data : ")
+            print("[1] KRS")
+            print("[2] Schedule")
+            ch = int(input("Please select the type : "))
+            
+            parent_div = None
+            
+            if (ch == 1) :
+                parent_div = soup.find('div', {'id': 'nav-matakuliah'})    
+                table_headers = [ "", "Hari", "Jam", "Kode Matkul", "Mata Kuliah", "Dosen", "Asisten Dosen", "Ruang", "Kelas", "Tatap Muka", "Angkatan", "Kapasitas" ]  
+            elif (ch == 2) :
+                parent_div = soup.find('div', {'id': 'nav-jadwalku'})
+                table_headers = [ "", "Hari", "Jam", "Kelas", "Ruang", "Kode Matkul", "Mata Kuliah", "SKS", "Dosen", "Tatap Muka", "Jurusan", "Kapasitas" ]
+            else : 
+                print("Type not found!!")
+                return 0
 
             # Ensure the div was found
             if parent_div:
-                print("Found the 'nav-matakuliah' div!")
+                print("Found the parent div!")
 
                 # Locate the table within the div
                 table = parent_div.find('table')
 
                 # Ensure the table was found
                 if table:
-                    print("Found the table within 'nav-matakuliah' div!")
+                    print("Found the table within parent div!")
                     
                     file_name = input("Please enter file name : ")
                     file_name = file_name + ".xlsx"
@@ -114,8 +128,8 @@ class Scrapper :
                     print(f"Data saved to {file_name}!")
                     return 1
                 else:
-                    print("Table not found within 'nav-matakuliah' div.")
+                    print("Table not found within parent div.")
                     return 0
             else:
-                print("Div with id 'nav-matakuliah' not found.")
+                print("Parent Div with id not found.")
                 return 0
