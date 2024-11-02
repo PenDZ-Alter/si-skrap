@@ -8,7 +8,7 @@ A simple program to get all data subjects and schedules of _siakad UIN Malang_ (
 2. Install Requirements <br>
     Run command
     ```bash
-    pip install -r requirement.txt
+    pip install -r requirements.txt
     ```
 
 3. Input your user credentials <br>
