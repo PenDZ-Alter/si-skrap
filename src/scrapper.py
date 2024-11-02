@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import os
 from bs4 import BeautifulSoup
-from data import Data
+from src.data import Data
 
 class Scrapper :    
     def __init__(self) :

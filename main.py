@@ -1,4 +1,4 @@
-from scrapper import Scrapper
+from src.scrapper import Scrapper
 
 if __name__ == '__main__' :
     # Create a Scrapper instance

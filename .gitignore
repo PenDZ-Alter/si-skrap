@@ -6,3 +6,5 @@ base.py
 TODO.md
 
 __pycache__
+*.xlsx
+*.xls
