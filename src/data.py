@@ -4,9 +4,11 @@ from dotenv import load_dotenv
 class Data :
     # Protected Variables
     _payload = None
+    _result_payload = None
     _data_url = None
     _login_url = None
     _captcha_url = None
+    _result_url = None
     
     def __init__(self) :
         load_dotenv()
@@ -16,12 +18,23 @@ class Data :
             'captcha_entered': '',
             'csrf_token' : ''
         }
+        self._result_payload = {
+            'ta' : '',
+            'smt' : ''
+        }
         self._data_url = "https://siakad.uin-malang.ac.id/2.0/uin-PnjdwlnPmsrn"
+        self._result_url = "https://siakad.uin-malang.ac.id/2.0/uin-khs"
         self._login_url = "https://siakad.uin-malang.ac.id/cek_login.php"
         self._captcha_url = "https://siakad.uin-malang.ac.id/captcha.php"
     
     def get_payload(self) :
         return self._payload
+    
+    def get_result_payload(self, ta, smt) : 
+        self._result_payload['ta'] = ta
+        self._result_payload['smt'] = smt
+        
+        return self._result_payload
     
     def set_captcha_payload(self, value) :
         self._payload['captcha_entered'] = value
@@ -29,8 +42,14 @@ class Data :
     def set_csrf_token_payload(self, value) : 
         self._payload['csrf_token'] = value
     
-    def get_url(self) :
-        return self._data_url
+    def get_url(self, type) :
+        match type : 
+            case 0 : 
+                return self._data_url
+            case 1 : 
+                return self._result_url
+            case _ : 
+                return 0
     
     def get_login(self) :
         return self._login_url

@@ -7,5 +7,6 @@ if __name__ == '__main__' :
     scrapper.load_csrf_token()
     scrapper.captcha_resolver()
     scrapper.post_data()
-    scrapper.fetch_data()
+    # scrapper.fetch_data()
+    scrapper.debug_data()
     scrapper.parse_file()

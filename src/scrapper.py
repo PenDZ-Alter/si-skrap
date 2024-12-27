@@ -53,8 +53,34 @@ class Scrapper :
     def fetch_data(self) :
         if self.post_data() :
             print("Login Successful!")
-            data_response = self.session.get(self.data.get_url())
+            data_response = self.session.get(self.data.get_url(type = 0))
             
+            if data_response.status_code == 200 :
+                return data_response
+            else :
+                print("Failed to access data page!")
+                print(data_response)
+                return 0
+        else : 
+            print("Failed to fetch data!!")
+            return 0
+        
+    def debug_data(self) : 
+        if self.post_data() :
+            print("Login Successful!")
+            data_response = self.session.get(self.data.get_url(type = 1))
+            debug_soup = BeautifulSoup(data_response.text, 'html.parser')
+            
+            form_act = debug_soup.find('form')['action']
+            if not form_act.startswith('http') : 
+                form_act = self.data.get_url(type = 1) + form_act
+                
+            post_res = self.session.post(form_act, data=self.data.get_result_payload(2324, 2))
+            
+            post_soup = BeautifulSoup(post_res.text, 'html.parser')
+            
+            print(post_soup.prettify())
+                        
             if data_response.status_code == 200 :
                 return data_response
             else :

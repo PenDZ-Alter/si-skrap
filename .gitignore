@@ -1,6 +1,6 @@
 .env
 captcha.jpg
-test.html
+*.html
 
 base.py
 TODO.md
