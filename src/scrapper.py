@@ -17,7 +17,7 @@ class Scrapper :
         login_response = self.session.get(self.data.get_login())
         self.login_parser = BeautifulSoup(login_response.content, 'html.parser')
         if self.login_parser is None : 
-            print("Failed to parsing data!!")
+            print("ERR :: Failed to parsing data!!")
             return False
         else : 
             return True
@@ -28,7 +28,7 @@ class Scrapper :
             self.data.set_csrf_token_payload(csrf_token['value'])
             return True
         else :
-            print("No CSRF token found!")
+            print("INFO :: No CSRF token found!")
             return False
     
     def captcha_resolver(self) : 
@@ -47,27 +47,27 @@ class Scrapper :
         if 'logout' in self.login_response.text.lower() :
             return True
         else :
-            print("Login Failed!")
+            print("INFO :: Login Failed!")
             return False
         
-    def fetch_data(self) :
+    def fetch_subjects_data(self) :
         if self.post_data() :
-            print("Login Successful!")
+            print("INFO :: Login Successful!")
             data_response = self.session.get(self.data.get_url(type = 0))
             
             if data_response.status_code == 200 :
                 return data_response
             else :
-                print("Failed to access data page!")
+                print("ERR :: Failed to access data page!")
                 print(data_response)
                 return 0
         else : 
-            print("Failed to fetch data!!")
+            print("ERR :: Failed to fetch data!!")
             return 0
         
-    def debug_data(self) : 
+    def fetch_grades_data(self, ta, smt) : 
         if self.post_data() :
-            print("Login Successful!")
+            print("INFO :: Login Successful!")
             data_response = self.session.get(self.data.get_url(type = 1))
             debug_soup = BeautifulSoup(data_response.text, 'html.parser')
             
@@ -75,30 +75,31 @@ class Scrapper :
             if not form_act.startswith('http') : 
                 form_act = self.data.get_url(type = 1) + form_act
                 
-            post_res = self.session.post(form_act, data=self.data.get_result_payload(2324, 2))
+            post_payload = self.session.post(form_act, data=self.data.get_result_payload(ta, smt))
             
-            post_soup = BeautifulSoup(post_res.text, 'html.parser')
+            post_response = BeautifulSoup(post_payload.text, 'html.parser')
             
-            print(post_soup.prettify())
+            print("DEBUG :: Showing response ...")
+            print(post_response.prettify())
                         
             if data_response.status_code == 200 :
-                return data_response
+                return post_response
             else :
-                print("Failed to access data page!")
+                print("ERR :: Failed to access data page!")
                 print(data_response)
                 return 0
         else : 
-            print("Failed to fetch data!!")
+            print("ERR :: Failed to fetch data!!")
             return 0
             
-    def parse_file(self) : 
-        if self.fetch_data() == 0 :
-            print("Can't get fetched data!")
+    def parse_subjects_file(self) : 
+        if self.fetch_subjects_data() == 0 :
+            print("ERR :: Can't get fetched data!")
             return 0
         else : 
-            print("Data page accessed successfully!")
+            print("INFO :: Data page accessed successfully!")
             # Parse the HTML content of the data response
-            soup = BeautifulSoup(self.fetch_data().content, 'html.parser')
+            soup = BeautifulSoup(self.fetch_subjects_data().content, 'html.parser')
             
             table_headers = None
 
@@ -116,19 +117,19 @@ class Scrapper :
                 parent_div = soup.find('div', {'id': 'nav-jadwalku'})
                 table_headers = [ "", "Hari", "Jam", "Kelas", "Ruang", "Kode Matkul", "Mata Kuliah", "SKS", "Dosen", "Tatap Muka", "Jurusan", "Kapasitas" ]
             else : 
-                print("Type not found!!")
+                print("INFO :: Type not found!!")
                 return 0
 
             # Ensure the div was found
             if parent_div:
-                print("Found the parent div!")
+                print("INFO :: Found the parent div!")
 
                 # Locate the table within the div
                 table = parent_div.find('table')
 
                 # Ensure the table was found
                 if table:
-                    print("Found the table within parent div!")
+                    print("INFO :: Found the table within parent div!")
                     
                     file_name = input("Please enter file name : ")
                     file_name = file_name + ".xlsx"
@@ -147,15 +148,18 @@ class Scrapper :
                         i = i + 1
                         table_data.append(data)
                         
-                    print("Total data =", i)
+                    print("INFO :: Total data =", i)
                     
                     df = pd.DataFrame(table_data)
                     df.to_excel(file_name, index=False, header=table_headers)
-                    print(f"Data saved to {file_name}!")
+                    print(f"INFO :: Data saved to {file_name}!")
                     return 1
                 else:
-                    print("Table not found within parent div.")
+                    print("INFO :: Table not found within parent div.")
                     return 0
             else:
-                print("Parent Div with id not found.")
+                print("INFO :: Parent div with id not found.")
                 return 0
+            
+    def parse_grades_file(self) :
+        pass
